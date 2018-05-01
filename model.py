@@ -5,8 +5,6 @@ __author__  = "Christoph Bartsch";
 __credits__ = ["Eugene M. Izhikevich"];
 __license__ = "MIT";
 __status__  = "Prototype";
-__email__   = "christoph.bartsch@stud.uni-goettingen.de";
-
 
 
 import matplotlib.pyplot as plt
@@ -16,22 +14,22 @@ class Neuron:
     # The base neuron class that does all the computation.
     # For different neuron dynamics, change the parameters
     # a through d
-    def __init__ (self, a = 0.02, b = 0.2, c = -50, d = 2):
+    def __init__ (self, a, b, c, d):
         self.a = a;
         self.b = b;
         self.c = c;
         self.d = d;
-        self.u = d;
-        self.v = c;
+        self.u = 0;
+        self.v = 0;
     
-    def Step(self, t = 0.1, I = 10):
+    def Step(self, t = 1, I = 10):
         # Simulates a single step of length t with dc-voltage I
         # This corresponds directly to the paper
         self.u = self.u + t * (self.a * (self.b*self.v - self.u));
         self.v = self.v + t * (0.04 * (self.v*self.v) + 5* self.v + 140 - self.u +I);
         if (self.v >= 30):
             self.v = self.c;
-            self.u = self.d;
+            self.u = self.u + self.d;
     
     def Simulate (self, steps = 2000, I = [10]*2000):
         # Simulate number of steps with dc-voltage I
@@ -46,11 +44,12 @@ class Neuron:
             _I = I[0];
             if (len (I) > 1):
                 I = I[1:];
-            self.Step(I = _I);
+            self.Step(t=1, I = _I);
             vecV.append(self.v);
             vecU.append(self.u);
             vecI.append(_I);
         Plot (vecV, vecU, vecI);
+        return vecV;
 
 
 def Plot (vecV, vecU, vecI):
@@ -62,3 +61,8 @@ def Plot (vecV, vecU, vecI):
     plt.xlabel('mS');
     plt.ylabel('mV');
     plt.show();
+
+
+if (__name__ == '__main__'):
+    neuron = Neuron(0.02, 0.2, -55, 2);
+    neuron.Simulate(steps=300);
