@@ -21,8 +21,11 @@ class Neuron:
         self.d = d;
         self.u = 0;
         self.v = 0;
+        self.vecV = [];
+        self.vecU = [];
+        self.vecI = [];
     
-    def Step(self, t = 1, I = 10):
+    def Step(self, t = 0.1, I = 10):
         # Simulates a single step of length t with dc-voltage I
         # This corresponds directly to the paper
         self.u = self.u + t * (self.a * (self.b*self.v - self.u));
@@ -36,20 +39,19 @@ class Neuron:
         #  I is a list, I[n] corresponds to I during step n.
         #  If the size of I is smaller than the number of steps,
         #  the last entry of I will be used for the remainder of the sim.
-        vecV = [];
-        vecU = [];
-        vecI = [];
             
         for i in range (0, steps):
             _I = I[0];
             if (len (I) > 1):
                 I = I[1:];
             self.Step(t=1, I = _I);
-            vecV.append(self.v);
-            vecU.append(self.u);
-            vecI.append(_I);
-        Plot (vecV, vecU, vecI);
-        return vecV;
+            self.vecV.append(self.v);
+            self.vecU.append(self.u);
+            self.vecI.append(_I);
+    
+    def Plot(self):
+        Plot (self.vecV, self.vecU, self.vecI);
+
 
 
 def Plot (vecV, vecU, vecI):
@@ -64,5 +66,11 @@ def Plot (vecV, vecU, vecI):
 
 
 if (__name__ == '__main__'):
-    neuron = Neuron(0.02, 0.2, -55, 2);
-    neuron.Simulate(steps=300);
+    print ("Enter a b c d:");
+    inp = list(map(float, input().split(' ')));
+    neuron = Neuron(inp[0], inp[1], inp[2], inp[3])
+    print ("Enter steps I:");
+    inp = list(map(float, input().split(' ')));
+    neuron.Simulate(steps=int(inp[0]), I=[inp[1]]);
+    print (int (inp[0]));
+    neuron.Plot();
